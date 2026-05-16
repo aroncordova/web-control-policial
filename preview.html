@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="favicon.png" />
+    <title>Control Policial Emova | Subte</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-width: 320px;
+        font-family: Inter, "Segoe UI", Arial, sans-serif;
+        color: #e8f3f7;
+        background:
+          radial-gradient(circle at top left, rgba(0, 160, 223, .16), transparent 34rem),
+          radial-gradient(circle at 78% 6%, rgba(246, 193, 65, .12), transparent 28rem),
+          #071016;
+      }
+      body:before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+        background-size: 42px 42px;
+      }
+      main { position: relative; max-width: 1280px; margin: 0 auto; padding: 24px; }
+      .panel {
+        border: 1px solid rgba(79,143,162,.22);
+        border-radius: 8px;
+        background: linear-gradient(180deg, rgba(14,35,45,.9), rgba(8,22,30,.92));
+        box-shadow: 0 24px 60px rgba(0,0,0,.22);
+      }
+      header { display: flex; justify-content: space-between; gap: 24px; padding: 22px; align-items: center; }
+      .brand { display: flex; gap: 16px; align-items: flex-start; }
+      .icon {
+        width: 48px; height: 48px; border-radius: 6px; display: grid; place-items: center;
+        border: 1px solid rgba(0,160,223,.4); background: rgba(0,160,223,.15); color: #00a0df;
+        box-shadow: 0 0 32px rgba(0,160,223,.18);
+      }
+      .eyebrow { color: #f6c141; font-size: 12px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; }
+      h1 { margin: 8px 0; font-size: clamp(28px, 4vw, 42px); line-height: 1.05; }
+      p { color: #b7c8cf; line-height: 1.6; }
+      .status { display: grid; grid-template-columns: repeat(2, minmax(120px, 1fr)); gap: 10px; }
+      .pill { border: 1px solid rgba(0,160,223,.3); border-radius: 6px; padding: 10px 12px; background: rgba(0,160,223,.1); }
+      .pill small { display: block; color: #87b8c8; text-transform: uppercase; letter-spacing: .14em; font-size: 10px; }
+      .pill strong { display: block; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .identity { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px; margin-bottom: 10px; }
+      .logo-tile { min-height: 64px; display: flex; align-items: center; justify-content: center; padding: 8px 6px; text-align: center; overflow: hidden; }
+      .logo-emova-tile { width: 176px; }
+      .logo-police-tile { width: 96px; }
+      .logo-divider { color: #7f98a2; font-size: 28px; font-weight: 300; line-height: 1; }
+      .logo-tile img { display: block; max-height: 56px; max-width: 100%; object-fit: contain; }
+      .logo-real, .logo-dark { background: transparent; }
+      .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 18px 0; }
+      .card { padding: 18px; }
+      .card span { color: #9fb3ba; font-size: 14px; }
+      .card strong { display: block; margin-top: 8px; font-size: 34px; color: white; }
+      .card small { color: #6f8790; }
+      .layout { display: grid; grid-template-columns: 1fr 360px; gap: 16px; }
+      .toolbar { display: grid; grid-template-columns: 1.4fr .8fr .8fr .8fr .8fr; gap: 10px; margin: 18px 0; }
+      input, select {
+        width: 100%; height: 44px; border-radius: 6px; border: 1px solid #12303b;
+        background: rgba(7,16,22,.75); color: white; padding: 0 12px; outline: none;
+      }
+      button {
+        height: 44px; border: 0; border-radius: 6px; background: #00a0df; color: #071016;
+        padding: 0 16px; font-weight: 800; cursor: pointer;
+      }
+      table { width: 100%; min-width: 1180px; table-layout: fixed; border-collapse: collapse; font-size: 13px; }
+      .table-wrap { overflow: auto; max-height: 560px; border: 1px solid #12303b; border-radius: 8px; }
+      .mobile-list { display: none; }
+      th { position: sticky; top: 0; background: #0b1a22; color: #90a4ac; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+      th, td { padding: 9px 10px; text-align: left; border-bottom: 1px solid rgba(18,48,59,.8); vertical-align: top; line-height: 1.28; }
+      td:nth-child(1) { width: 78px; }
+      td:nth-child(2) { width: 92px; }
+      td:nth-child(3) { width: 180px; }
+      td:nth-child(4) { width: 160px; }
+      td:nth-child(5) { width: 76px; }
+      td:nth-child(6) { width: 142px; }
+      td:nth-child(7) { width: 150px; }
+      td:nth-child(8) { width: 118px; }
+      td:nth-child(9) { width: 104px; }
+      td:nth-child(10) { width: 96px; }
+      td small { color: #6f8790; font-size: 11px; line-height: 1.25; }
+      tr:hover td { background: rgba(0,160,223,.08); }
+      .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; background: rgba(246,193,65,.15); color: #f6c141; }
+      .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; }
+      .ok { color: #b7f7d2; background: rgba(52,211,153,.1); border: 1px solid rgba(52,211,153,.28); }
+      .warn { color: #fff1b8; background: rgba(246,193,65,.1); border: 1px solid rgba(246,193,65,.28); }
+      .bad { color: #ffd0d2; background: rgba(255,90,95,.1); border: 1px solid rgba(255,90,95,.35); }
+      .side { padding: 18px; margin-bottom: 16px; }
+      .bar-row { margin: 13px 0; }
+      .bar-label { display: flex; justify-content: space-between; color: #91a8b0; font-size: 12px; margin-bottom: 6px; }
+      .bar { height: 8px; border-radius: 999px; background: #071016; overflow: hidden; }
+      .bar div { height: 100%; border-radius: 999px; background: #00a0df; }
+      .edit-btn { height: 32px; border: 1px solid rgba(0,160,223,.35); background: rgba(0,160,223,.1); color: #d7f6ff; font-size: 11px; padding: 0 10px; }
+      .modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; padding: 16px; background: rgba(0,0,0,.62); backdrop-filter: blur(8px); z-index: 10; }
+      .modal.open { display: flex; }
+      .splash { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: rgba(7,16,22,.96); backdrop-filter: blur(10px); transition: opacity .45s ease, visibility .45s ease; }
+      .splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+      .splash-inner { width: min(760px, 100%); display: flex; flex-direction: column; align-items: center; gap: 26px; text-align: center; }
+      .splash-logos { width: 100%; display: flex; align-items: center; justify-content: center; gap: 16px; }
+      .splash-logo { height: 120px; display: flex; align-items: center; justify-content: center; padding: 16px; }
+      .splash-emova { width: 230px; }
+      .splash-police { width: 160px; }
+      .splash-divider { color: #7f98a2; font-size: 42px; font-weight: 300; line-height: 1; }
+      .splash-logo img { max-width: 100%; max-height: 96px; object-fit: contain; }
+      .splash small { color: #f6c141; font-weight: 800; letter-spacing: .28em; text-transform: uppercase; }
+      .splash h2 { margin: 10px 0 6px; color: white; font-size: clamp(26px, 5vw, 42px); }
+      .editor { width: min(1040px, 100%); max-height: 92vh; overflow: auto; padding: 20px; }
+      .editor-head { display: flex; justify-content: space-between; gap: 16px; align-items: center; border-bottom: 1px solid #12303b; padding-bottom: 14px; margin-bottom: 16px; }
+      .editor-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+      .field label { display: block; margin-bottom: 5px; color: #7f98a2; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+      .field input, .field select, .field textarea { width: 100%; border: 1px solid #12303b; border-radius: 6px; background: rgba(7,16,22,.82); color: white; padding: 10px; }
+      .field textarea { min-height: 86px; resize: vertical; }
+      .span-3 { grid-column: span 3; }
+      @media (max-width: 980px) {
+        header, .layout { grid-template-columns: 1fr; display: grid; }
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        .toolbar { grid-template-columns: 1fr 1fr; }
+        .identity { justify-content: flex-end; }
+      }
+      @media (max-width: 640px) {
+        main { padding: 14px; }
+        .stats, .toolbar, .status { grid-template-columns: 1fr; }
+        header { padding: 16px; }
+        .brand { align-items: center; }
+        .icon { width: 42px; height: 42px; }
+        h1 { font-size: 25px; }
+        .table-wrap { display: none; }
+        .mobile-list { display: block; max-height: 650px; overflow: auto; border: 1px solid #12303b; border-radius: 8px; background: rgba(7,16,22,.35); padding: 10px; }
+        .day-card-title { position: sticky; top: 0; z-index: 2; margin: 0 0 10px; border: 1px solid rgba(0,160,223,.25); border-radius: 6px; background: #0b1a22; color: #d7f6ff; padding: 9px 10px; font-size: 13px; font-weight: 800; }
+        .record-card { border: 1px solid #12303b; border-radius: 8px; background: rgba(12,26,34,.78); padding: 12px; margin-bottom: 10px; }
+        .record-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+        .record-top h3 { margin: 4px 0 2px; color: white; font-size: 14px; line-height: 1.35; }
+        .mobile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .mobile-fact { border: 1px solid #12303b; border-radius: 6px; background: rgba(7,16,22,.62); padding: 8px; font-size: 12px; }
+        .mobile-fact span { display: block; color: #7f98a2; font-size: 11px; margin-bottom: 3px; }
+        .mobile-fact.wide { grid-column: span 2; }
+        .mobile-note { margin-top: 10px; border: 1px solid #12303b; border-radius: 6px; background: rgba(7,16,22,.55); color: #c9d7dc; padding: 8px; font-size: 12px; line-height: 1.45; }
+        .mobile-edit { width: 100%; margin-top: 10px; }
+        .editor-grid { grid-template-columns: 1fr; }
+        .span-3 { grid-column: span 1; }
+        .splash-logos { gap: 8px; }
+        .splash-logo { height: 96px; padding: 8px; }
+        .splash-emova { width: 172px; }
+        .splash-police { width: 96px; }
+        .splash-divider { font-size: 30px; }
+        .logo-emova-tile { width: 148px; }
+        .logo-police-tile { width: 78px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="splash" class="splash" onclick="hideSplash()">
+      <div class="splash-inner">
+        <div class="splash-logos">
+          <div class="splash-logo splash-emova"><img src="logo-emova-transparente.png" alt="Logo EMOVA"></div>
+          <div class="splash-divider">|</div>
+          <div class="splash-logo splash-police"><img src="logo-policia-ciudad-transparente.png" alt="Logo Policía de la Ciudad de Buenos Aires"></div>
+        </div>
+        <div>
+          <small>Centro de monitoreo integral</small>
+          <h2>Control Policial Emova | Subte</h2>
+          <p>Cargando registros operativos...</p>
+        </div>
+      </div>
+    </div>
+    <main>
+      <header class="panel">
+        <div class="brand">
+          <div class="icon">⌁</div>
+          <div>
+            <div class="eyebrow">EMOVA · SubTE · CMI</div>
+            <h1>Control Policial Operativo</h1>
+            <p>Panel de monitoreo para seguimiento de coberturas, dotaciones, estaciones y novedades del servicio.</p>
+          </div>
+        </div>
+        <div>
+          <div class="identity">
+            <div class="logo-tile logo-dark logo-emova-tile"><img src="logo-emova-transparente.png" alt="Logo EMOVA"></div>
+            <div class="logo-divider">|</div>
+            <div class="logo-tile logo-real logo-police-tile"><img src="logo-policia-ciudad-transparente.png" alt="Logo Policía de la Ciudad de Buenos Aires"></div>
+          </div>
+          <div class="status">
+            <div class="pill"><small>Sistema</small><strong>En línea</strong></div>
+            <div class="pill"><small>Fuente</small><strong id="sourceName">Excel auto</strong></div>
+          </div>
+        </div>
+      </header>
+
+      <section class="stats">
+        <article class="panel card"><span>Efectivos filtrados</span><strong id="staff">25</strong><small>5 registros activos</small></article>
+        <article class="panel card"><span>Líneas de la red</span><strong id="lines">6</strong><small>A, B, C, D, E y H</small></article>
+        <article class="panel card"><span>Fiscalizados</span><strong id="audited">3</strong><small>Control de seguridad</small></article>
+        <article class="panel card"><span>Alertas</span><strong id="alerts">2</strong><small>Observación y críticos</small></article>
+      </section>
+
+      <section class="layout">
+        <div class="panel card">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+            <div>
+              <h2 style="margin:0;color:white">Registros de cobertura</h2>
+              <p style="margin:4px 0 0">Búsqueda, filtros y lectura operativa de la dotación policial.</p>
+            </div>
+            <button onclick="document.getElementById('excel').click()">Importar Excel</button>
+            <input id="excel" type="file" accept=".xlsx,.xls,.csv" hidden />
+          </div>
+          <div class="toolbar">
+            <input id="q" placeholder="Buscar por estación, fuerza, puesto o novedad" />
+            <select id="day" aria-label="Fecha"><option>Fechas</option></select>
+            <select id="line" aria-label="Línea"><option>Líneas</option><option>Línea A</option><option>Línea B</option><option>Línea C</option><option>Línea D</option><option>Línea E</option><option>Línea H</option></select>
+            <select id="state" aria-label="Estado"><option>Estados</option><option>Operativo</option><option>Observación</option><option>Crítico</option></select>
+            <select id="shift" aria-label="Turno"><option>Turnos</option><option>05:30 A 13:30 - Turno Mañana</option><option>16:30 A 00:00 - Turno Tarde</option></select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <colgroup><col style="width:78px"><col style="width:92px"><col style="width:180px"><col style="width:160px"><col style="width:76px"><col style="width:142px"><col style="width:150px"><col style="width:118px"><col style="width:104px"><col style="width:96px"><col></colgroup>
+              <thead><tr><th>Acción</th><th>Fecha</th><th>Personal</th><th>Cubre puesto</th><th>Línea</th><th>Estación</th><th>Horario</th><th>Dependencia</th><th>Fiscalización</th><th>Estado</th><th>Control CMI / Novedad</th></tr></thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+          <div id="mobileRows" class="mobile-list"></div>
+        </div>
+        <aside>
+          <div class="panel side">
+            <h2 style="margin-top:0;color:white">Mapa operativo</h2>
+            <div id="bars"></div>
+          </div>
+          <div class="panel side">
+            <h2 style="margin-top:0;color:white">Importación</h2>
+            <p>La versión React final acepta Excel con una o varias hojas y normaliza campos operativos como fecha, línea, estación, turno, dotación y novedades.</p>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <div id="modal" class="modal">
+      <section class="panel editor">
+        <div class="editor-head">
+          <div>
+            <h2 style="margin:0;color:white">Editar registro policial</h2>
+            <p style="margin:4px 0 0">Modificá los datos y guardá para actualizar la tabla.</p>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onclick="closeEditor()" style="background:#071016;color:#dbe7eb;border:1px solid #12303b">Cancelar</button>
+            <button onclick="saveEditor()">Guardar</button>
+          </div>
+        </div>
+        <div class="editor-grid">
+          <div class="field"><label>Fecha</label><input id="edit-fecha"></div>
+          <div class="field"><label>Hora</label><input id="edit-hora"></div>
+          <div class="field"><label>DNI titular</label><input id="edit-dni"></div>
+          <div class="field"><label>Apellido y nombre</label><input id="edit-nombre"></div>
+          <div class="field"><label>DNI cubre puesto</label><input id="edit-dniCubre"></div>
+          <div class="field"><label>Cubre puesto</label><input id="edit-cubre"></div>
+          <div class="field"><label>Línea</label><select id="edit-linea"><option>Línea A</option><option>Línea B</option><option>Línea C</option><option>Línea D</option><option>Línea E</option><option>Línea H</option></select></div>
+          <div class="field"><label>Estación</label><input id="edit-estacion"></div>
+          <div class="field"><label>Turno</label><select id="edit-turno"><option>05:30 A 13:30 - Turno Mañana</option><option>16:30 A 00:00 - Turno Tarde</option></select></div>
+          <div class="field"><label>Ingreso</label><input id="edit-ingreso"></div>
+          <div class="field"><label>Egreso</label><input id="edit-egreso"></div>
+          <div class="field"><label>Fiscalizado</label><select id="edit-fiscalizado"><option>SI</option><option>NO</option><option>-</option></select></div>
+          <div class="field"><label>Dependencia</label><input id="edit-dependencia"></div>
+          <div class="field"><label>Dotación</label><input id="edit-dotacion" type="number" min="1"></div>
+          <div class="field"><label>Estado</label><select id="edit-estado"><option>Operativo</option><option>Observación</option><option>Crítico</option></select></div>
+          <div class="field span-3"><label>Control CMI</label><textarea id="edit-control"></textarea></div>
+          <div class="field span-3"><label>Observaciones</label><textarea id="edit-novedad"></textarea></div>
+        </div>
+      </section>
+    </div>
+
+    <script src="control-policial-data.js"></script>
+    <script>
+      function hideSplash() {
+        document.getElementById("splash").classList.add("hide");
+      }
+      setTimeout(hideSplash, 2300);
+      let editingIndex = null;
+      const fallbackRecords = [
+        { fecha: "2026-05-15", hora: "06:00", dni: "41.285.945", nombre: "MELGAREJO, CLAUDIA MARLENE", cubre: "-", dniCubre: "-", linea: "Línea B", estacion: "Carlos Pellegrini", turno: "05:30 A 13:30 - Turno Mañana", ingreso: "05:26", egreso: "13:30", dependencia: "PFA", dotacion: 1, fiscalizado: "SI", estado: "Operativo", control: "Se observa al adicional en puesto.", novedad: "Refuerzo en hora pico y control preventivo de accesos." },
+        { fecha: "2026-05-15", hora: "08:30", dni: "36.570.634", nombre: "CABAÑA GOMEZ, MICAELA", cubre: "GARCIA, JESICA", dniCubre: "-", linea: "Línea D", estacion: "Catedral", turno: "05:30 A 13:30 - Turno Mañana", ingreso: "05:14", egreso: "S/I", dependencia: "Policía de la Ciudad", dotacion: 2, fiscalizado: "NO", estado: "Observación", control: "Pendiente de confirmación de egreso.", novedad: "Demora por alta concentración de pasajeros." },
+        { fecha: "2026-05-15", hora: "16:30", dni: "36.646.673", nombre: "CASTRO, MARIA ALEJANDRA", cubre: "CELARIO, DALILA", dniCubre: "-", linea: "Línea A", estacion: "Plaza de Mayo", turno: "16:30 A 00:00 - Turno Tarde", ingreso: "16:30", egreso: "00:00", dependencia: "PFA", dotacion: 2, fiscalizado: "SI", estado: "Operativo", control: "Control visual normal.", novedad: "Control de rutina sin novedades relevantes." },
+        { fecha: "2026-05-15", hora: "18:10", dni: "39.742.740", nombre: "MALDONADO, MANUEL DAVID", cubre: "ENRIQUEZ, ADRIAN", dniCubre: "-", linea: "Línea C", estacion: "Constitución", turno: "16:30 A 00:00 - Turno Tarde", ingreso: "16:34", egreso: "S/I", dependencia: "Policía de la Ciudad", dotacion: 2, fiscalizado: "SI", estado: "Crítico", control: "Fiscalización informa ausencia temporal del adicional.", novedad: "Intervención por incidente menor, seguimiento desde CMI." },
+        { fecha: "2026-05-15", hora: "22:00", dni: "30.046.398", nombre: "ACOSTA, AGUSTIN LUIS", cubre: "-", dniCubre: "-", linea: "Línea H", estacion: "Once", turno: "16:30 A 00:00 - Turno Tarde", ingreso: "22:00", egreso: "S/I", dependencia: "Gendarmería", dotacion: 1, fiscalizado: "-", estado: "Operativo", control: "Cobertura activa en monitoreo.", novedad: "Cobertura nocturna activa." },
+        { fecha: "2026-05-15", hora: "07:10", dni: "34.918.276", nombre: "FERNANDEZ, MARCELO JAVIER", cubre: "SOSA, PAULA", dniCubre: "-", linea: "Línea E", estacion: "Bolívar", turno: "05:30 A 13:30 - Turno Mañana", ingreso: "05:42", egreso: "13:34", dependencia: "Policía de la Ciudad", dotacion: 2, fiscalizado: "SI", estado: "Operativo", control: "Adicional observado en puesto asignado.", novedad: "Cobertura normal de Línea E." }
+      ];
+      const records = (window.CONTROL_POLICIAL_RECORDS && window.CONTROL_POLICIAL_RECORDS.length ? window.CONTROL_POLICIAL_RECORDS : fallbackRecords)
+        .map((record) => ({ ...record, cubre: record.cubre ?? record.nombreCubre ?? "-", control: record.control ?? record.controlCmi ?? "" }));
+      document.getElementById("sourceName").textContent = window.CONTROL_POLICIAL_SOURCE || "Excel auto";
+      const q = document.getElementById("q"), day = document.getElementById("day"), line = document.getElementById("line"), state = document.getElementById("state"), shift = document.getElementById("shift");
+      const fields = ["fecha","hora","dni","nombre","dniCubre","cubre","linea","estacion","turno","ingreso","egreso","fiscalizado","dependencia","dotacion","estado","control","novedad"];
+      function timeLabel(value) {
+        return (!value || String(value).toUpperCase() === "S/I")
+          ? '<small style="font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#7f98a2">sin informar</small>'
+          : value;
+      }
+      function mobileFact(label, value, wide = false) {
+        return `<div class="mobile-fact ${wide ? "wide" : ""}"><span>${label}</span><b>${value || "S/D"}</b></div>`;
+      }
+      [...new Set(records.map(r => r.dia || r.fecha || "Sin día"))].forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        day.appendChild(option);
+      });
+      function render() {
+        const filtered = records.map((r, index) => ({ ...r, index })).filter(r => {
+          const text = Object.values(r).join(" ").toLowerCase();
+          const recordDay = r.dia || r.fecha || "Sin día";
+          return (!q.value || text.includes(q.value.toLowerCase())) && (day.value === "Fechas" || recordDay === day.value) && (line.value === "Líneas" || r.linea === line.value) && (state.value === "Estados" || r.estado === state.value) && (shift.value === "Turnos" || r.turno.includes(shift.value));
+        });
+        let currentDay = "";
+        const desktopHtml = filtered.map(r => {
+          const day = r.dia || r.fecha || "Sin día";
+          const dayHeader = day !== currentDay ? `<tr style="background:rgba(0,160,223,.15)"><td colspan="11"><b>${day}</b> · ${filtered.filter(item => (item.dia || item.fecha || "Sin día") === day).length} registros</td></tr>` : "";
+          currentDay = day;
+          return `${dayHeader}<tr><td><button class="edit-btn" onclick="openEditor(${r.index})">Editar</button></td><td><b>${r.fecha}</b><br><small>${r.hora}</small></td><td><b>${r.nombre}</b><br><small>DNI ${r.dni}</small></td><td><b>${r.cubre !== "-" ? r.cubre : "Sin reemplazo"}</b><br><small>${r.cubre !== "-" ? "Cubre puesto" : "Titular en puesto"}</small></td><td><span class="tag">${r.linea}</span></td><td><b>${r.estacion}</b><br><small>Cobertura operativa</small></td><td><b>${r.turno}</b><br><small>Ingreso: ${timeLabel(r.ingreso)}</small><br><small>Egreso: ${timeLabel(r.egreso)}</small></td><td>${r.dependencia}</td><td><span class="badge ${r.fiscalizado === "SI" ? "ok" : r.fiscalizado === "NO" ? "bad" : "warn"}">${r.fiscalizado}</span><br><small>Dotación ${r.dotacion}</small></td><td><span class="badge ${r.estado === "Crítico" ? "bad" : r.estado === "Observación" ? "warn" : "ok"}">${r.estado}</span></td><td>${r.control ?? r.controlCmi ?? ""}<br><small>${r.novedad ?? ""}</small></td></tr>`;
+        }).join("");
+        document.getElementById("rows").innerHTML = desktopHtml;
+        let mobileDay = "";
+        document.getElementById("mobileRows").innerHTML = filtered.map(r => {
+          const day = r.dia || r.fecha || "Sin día";
+          const dayHeader = day !== mobileDay ? `<div class="day-card-title">${day} · ${filtered.filter(item => (item.dia || item.fecha || "Sin día") === day).length} registros</div>` : "";
+          mobileDay = day;
+          return `${dayHeader}<article class="record-card"><div class="record-top"><div><small>${r.fecha}</small><h3>${r.nombre}</h3><small>DNI ${r.dni || "S/D"}</small></div><span class="badge ${r.estado === "Crítico" ? "bad" : r.estado === "Observación" ? "warn" : "ok"}">${r.estado}</span></div><div class="mobile-grid">${mobileFact("Línea", r.linea)}${mobileFact("Estación", r.estacion)}${mobileFact("Turno", r.turno, true)}${mobileFact("Ingreso", timeLabel(r.ingreso))}${mobileFact("Egreso", timeLabel(r.egreso))}${mobileFact("Fiscalizado", r.fiscalizado || "-")}${mobileFact("Cubre puesto", r.cubre !== "-" ? r.cubre : "Sin reemplazo", true)}</div>${(r.control || r.controlCmi || r.novedad) ? `<div class="mobile-note">${r.control ?? r.controlCmi ?? r.novedad}</div>` : ""}<button class="edit-btn mobile-edit" onclick="openEditor(${r.index})">Editar registro</button></article>`;
+        }).join("");
+        document.getElementById("staff").textContent = filtered.reduce((a, r) => a + r.dotacion, 0);
+        document.getElementById("lines").textContent = 6;
+        document.getElementById("audited").textContent = filtered.filter(r => r.fiscalizado === "SI").length;
+        document.getElementById("alerts").textContent = filtered.filter(r => r.estado === "Crítico" || r.estado === "Observación").length;
+        document.getElementById("bars").innerHTML = ["Línea A","Línea B","Línea C","Línea D","Línea E","Línea H"].map((l, i) => {
+          const count = filtered.filter(r => r.linea === l).length;
+          const width = filtered.length ? Math.max(8, count / filtered.length * 100) : 8;
+          return `<div class="bar-row"><div class="bar-label"><span>${l}</span><span>${count} registros</span></div><div class="bar"><div style="width:${width}%;background:${i % 2 ? "#00a0df" : "#f6c141"}"></div></div></div>`;
+        }).join("");
+      }
+      function openEditor(index) {
+        editingIndex = index;
+        const record = records[index];
+        fields.forEach(field => {
+          const el = document.getElementById(`edit-${field}`);
+          if (el) el.value = record[field] ?? "";
+        });
+        document.getElementById("modal").classList.add("open");
+      }
+      function closeEditor() {
+        editingIndex = null;
+        document.getElementById("modal").classList.remove("open");
+      }
+      function saveEditor() {
+        if (editingIndex === null) return;
+        fields.forEach(field => {
+          const el = document.getElementById(`edit-${field}`);
+          if (el) records[editingIndex][field] = field === "dotacion" ? Math.max(1, Number(el.value) || 1) : el.value;
+        });
+        closeEditor();
+        render();
+      }
+      [q, day, line, state, shift].forEach(el => el.addEventListener("input", render));
+      render();
+      setInterval(() => {
+        if (!document.getElementById("modal").classList.contains("open")) {
+          window.location.reload();
+        }
+      }, 30000);
+    </script>
+  </body>
+</html>
