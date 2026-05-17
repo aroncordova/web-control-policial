@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
-import { controlRecords, controlSource } from './controlData.js';
+import { controlRecords } from './controlData.js';
 import {
   AlertTriangle,
   BadgeCheck,
@@ -13,7 +13,6 @@ import {
   RadioTower,
   Save,
   Search,
-  ShieldCheck,
   Siren,
   X,
   TrainFront,
@@ -352,7 +351,6 @@ function App() {
   const [status, setStatus] = useState(allStatusesOption);
   const [shift, setShift] = useState(allShiftsOption);
   const [day, setDay] = useState(allDaysOption);
-  const [sourceName, setSourceName] = useState(controlRecords.length ? controlSource : 'Datos demo');
   const [importError, setImportError] = useState('');
   const [editingRecord, setEditingRecord] = useState(null);
   const fileInputRef = useRef(null);
@@ -421,7 +419,6 @@ function App() {
 
       setRecords(imported);
       setEditingRecord(null);
-      setSourceName(file.name);
       event.target.value = '';
     } catch (error) {
       setImportError('No se pudo leer el Excel. Probá con un archivo .xlsx o .xls válido.');
@@ -481,10 +478,6 @@ function App() {
 
             <div className="flex flex-col gap-3">
               <InstitutionalLogos />
-              <div className="grid grid-cols-2 gap-3 text-sm sm:flex sm:items-center">
-                <StatusPill icon={ShieldCheck} label="Sistema" value="En línea" tone="green" />
-                <StatusPill icon={CalendarDays} label="Fuente" value={sourceName} tone="blue" />
-              </div>
             </div>
           </div>
         </header>
@@ -781,21 +774,6 @@ function SplashScreen({ onSkip }) {
         </div>
       </div>
     </button>
-  );
-}
-
-function StatusPill({ icon: Icon, label, value, tone }) {
-  const color = tone === 'green' ? 'text-emerald-300 bg-emerald-400/10 border-emerald-400/30' : 'text-cyan-200 bg-emova/10 border-emova/30';
-  return (
-    <div className={`rounded-md border px-3 py-2 ${color}`}>
-      <div className="flex items-center gap-2">
-        <Icon className="h-4 w-4 shrink-0" />
-        <div className="min-w-0">
-          <div className="text-[10px] uppercase tracking-[0.18em] opacity-70">{label}</div>
-          <div className="truncate text-sm font-semibold">{value}</div>
-        </div>
-      </div>
-    </div>
   );
 }
 
