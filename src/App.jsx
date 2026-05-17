@@ -583,7 +583,7 @@ function App() {
                         </tr>
                         {items.map((record) => (
                           <Fragment key={`${record.id}-${record.estacion}-${record.hora}`}>
-                          <tr className="bg-panel/40 transition hover:bg-emova/10">
+                            <tr className="border-t border-line/80 bg-panel/40 transition hover:bg-emova/10">
                             <Td>
                               <button
                                 className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-emova/35 bg-emova/10 px-2 text-[11px] font-semibold text-cyan-100 transition hover:border-emova hover:bg-emova/20"
@@ -671,9 +671,10 @@ function App() {
                         </div>
 
                         {(record.controlCmi || record.novedad) ? (
-                          <p className="mt-2 rounded-md border border-line bg-ink/50 px-2.5 py-1.5 text-xs leading-4 text-slate-300">
-                            {record.controlCmi || record.novedad}
-                          </p>
+                          <div className="mt-2 rounded-md border-l-4 border-subte bg-ink/60 px-2.5 py-1.5 text-xs leading-4 text-slate-300">
+                            <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-200">Observaciones del registro</div>
+                            <p>{record.controlCmi || record.novedad}</p>
+                          </div>
                         ) : null}
 
                         <button
@@ -875,12 +876,17 @@ function CmiNote({ record }) {
   }
 
   return (
-    <tr className="bg-[#07151d]/80">
+    <tr className="border-b border-line/80 bg-panel/40">
       <td colSpan={10} className="px-3 pb-2 pt-0">
-        <div className="rounded-md border border-emova/20 bg-emova/5 px-3 py-2">
-          <div className="mb-1 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-200">
-            <RadioTower className="h-3.5 w-3.5" />
-            Control CMI / Novedades
+        <div className="ml-[78px] rounded-md border-l-4 border-subte bg-ink/65 px-3 py-2 shadow-inner shadow-black/10">
+          <div className="mb-1 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-200">
+              <RadioTower className="h-3.5 w-3.5" />
+              Observaciones asociadas al registro superior
+            </div>
+            <span className="hidden rounded bg-subte/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-subte lg:inline">
+              {record.estacion}
+            </span>
           </div>
           <div className="grid gap-2 text-[12px] leading-5 text-slate-200 lg:grid-cols-2">
             {control ? (
