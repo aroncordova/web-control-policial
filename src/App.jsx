@@ -256,6 +256,11 @@ function normalizePoliceStatus({ fiscalizado, egreso, observaciones, controlCmi 
   return normalizeStatus(text, index);
 }
 
+function normalizeFiscalizado(value) {
+  const text = String(value || '').trim().toUpperCase();
+  return !text || text === '-' ? 'NO' : text;
+}
+
 function normalizeGridRows(rows, sheetName) {
   const sheetDate = sheetName?.match(/\d{1,2}-\d{1,2}-\d{4}/)?.[0]?.replace(/(\d{2})-(\d{2})-(\d{4})/, '$3-$2-$1') ?? '';
   const cleanRows = rows
@@ -290,7 +295,7 @@ function normalizeGridRows(rows, sheetName) {
         turno: normalizeShift(likelyShift, index, row[8]),
         ingreso: row[8] || '',
         egreso: row[9] || '',
-        fiscalizado: row[10] || '-',
+        fiscalizado: normalizeFiscalizado(row[10]),
         dependencia: /ciudad/i.test(text) ? 'Policía de la Ciudad' : /pfa|federal/i.test(text) ? 'PFA' : 'Control policial',
         dotacion: Math.max(1, Math.min(12, staffCells.length || 1)),
         puesto: row[5] || row[4] || row[1] || 'Cobertura operativa',
@@ -315,7 +320,7 @@ function normalizeRecords(rows, sheetName) {
       const fallbackDate = sheetName?.match(/\d{1,2}-\d{1,2}-\d{4}/)?.[0]?.replace(/(\d{2})-(\d{2})-(\d{4})/, '$3-$2-$1') ?? '';
       const nombreCubre = String(resolveField(row, 'nombreCubre') || '');
       const dotacion = Number(resolveField(row, 'dotacion')) || (nombreCubre && nombreCubre !== '-' ? 2 : 1);
-      const fiscalizado = String(resolveField(row, 'fiscalizado') || '-').toUpperCase();
+      const fiscalizado = normalizeFiscalizado(resolveField(row, 'fiscalizado'));
       const egreso = toTime(resolveField(row, 'egreso')) || '';
       const observaciones = String(resolveField(row, 'novedad') || '');
       const controlCmi = String(resolveField(row, 'controlCmi') || '');
@@ -659,7 +664,7 @@ function App() {
                             <span className="block text-slate-500">Egreso</span>
                             <TimeValue label="" value={record.egreso} />
                           </div>
-                          <MobileFact label="Fiscalizado" value={record.fiscalizado || '-'} />
+                          <MobileFact label="Fiscalizado" value={normalizeFiscalizado(record.fiscalizado)} />
                           <MobileFact label="Cubre puesto" value={record.nombreCubre && record.nombreCubre !== '-' ? record.nombreCubre : 'Sin reemplazo'} wide />
                         </div>
 
@@ -919,7 +924,7 @@ function StatusBadge({ status }) {
 }
 
 function FiscalBadge({ value }) {
-  const normalized = String(value || '-').toUpperCase();
+  const normalized = normalizeFiscalizado(value);
   const className = normalized === 'SI'
     ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200'
     : normalized === 'NO'
@@ -988,7 +993,7 @@ function EditRecordPanel({ record, onChange, onCancel, onSave }) {
           <EditSelect label="Turno" value={record.turno} options={shiftOptions.filter((item) => item !== allShiftsOption)} onChange={(value) => onChange('turno', value)} />
           <EditField label="Ingreso" value={record.ingreso} onChange={(value) => onChange('ingreso', value)} />
           <EditField label="Egreso" value={record.egreso} onChange={(value) => onChange('egreso', value)} />
-          <EditSelect label="Fiscalizado" value={record.fiscalizado} options={['SI', 'NO', '-']} onChange={(value) => onChange('fiscalizado', value)} />
+          <EditSelect label="Fiscalizado" value={normalizeFiscalizado(record.fiscalizado)} options={['SI', 'NO']} onChange={(value) => onChange('fiscalizado', value)} />
           <EditField label="Dependencia" value={record.dependencia} onChange={(value) => onChange('dependencia', value)} />
           <EditField label="Dotación" type="number" value={record.dotacion} onChange={(value) => onChange('dotacion', value)} />
           <EditSelect label="Estado" value={record.estado} options={statusOptions.filter((item) => item !== allStatusesOption)} onChange={(value) => onChange('estado', value)} />

@@ -90,6 +90,13 @@ def status(fiscalizado: str, egreso: str, novedad: str, control_cmi: str) -> str
     return "Operativo"
 
 
+def normalize_fiscalizado(value: str) -> str:
+    text = clean(value).upper()
+    if not text or text == "-":
+        return "NO"
+    return text
+
+
 def build_records(excel_path: Path) -> list[dict]:
     workbook = pd.ExcelFile(excel_path)
     records: list[dict] = []
@@ -109,6 +116,7 @@ def build_records(excel_path: Path) -> list[dict]:
                 continue
             if data["dni"].upper() == "DNI" or "APELLIDO" in data["nombre"].upper():
                 continue
+            fiscalizado = normalize_fiscalizado(data["fiscalizado"])
 
             records.append(
                 {
@@ -126,11 +134,11 @@ def build_records(excel_path: Path) -> list[dict]:
                     "turnoExcel": data["turno_excel"],
                     "ingreso": data["ingreso"],
                     "egreso": data["egreso"],
-                    "fiscalizado": data["fiscalizado"] or "-",
+                    "fiscalizado": fiscalizado,
                     "dependencia": "Policía de la Ciudad",
                     "dotacion": 2 if data["nombreCubre"] and data["nombreCubre"] != "-" else 1,
                     "puesto": data["nombreCubre"] if data["nombreCubre"] and data["nombreCubre"] != "-" else "Titular",
-                    "estado": status(data["fiscalizado"], data["egreso"], data["novedad"], data["controlCmi"]),
+                    "estado": status(fiscalizado, data["egreso"], data["novedad"], data["controlCmi"]),
                     "controlCmi": data["controlCmi"],
                     "novedad": data["novedad"],
                 }
