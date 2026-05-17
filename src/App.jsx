@@ -663,10 +663,10 @@ function App() {
                           <MobileFact label="Cubre puesto" value={record.nombreCubre && record.nombreCubre !== '-' ? record.nombreCubre : 'Sin reemplazo'} wide />
                         </div>
 
-                        {(record.controlCmi || record.novedad) ? (
+                        {hasCmiNote(record) ? (
                           <div className="mt-2 rounded-md border-l-4 border-subte bg-ink/60 px-2.5 py-1.5 text-xs leading-4 text-slate-300">
                             <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-200">Observaciones del registro</div>
-                            <p>{record.controlCmi || record.novedad}</p>
+                            <p>{cleanNote(record.controlCmi) || cleanNote(record.novedad)}</p>
                           </div>
                         ) : null}
 
@@ -846,8 +846,8 @@ function SelectControl({ label, icon: Icon, value, onChange, options }) {
 }
 
 function CmiNote({ record }) {
-  const control = String(record.controlCmi || '').trim();
-  const novedad = String(record.novedad || '').trim();
+  const control = cleanNote(record.controlCmi);
+  const novedad = cleanNote(record.novedad);
 
   if (!control && !novedad) {
     return null;
@@ -860,7 +860,7 @@ function CmiNote({ record }) {
           <div className="mb-1 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-200">
               <RadioTower className="h-3.5 w-3.5" />
-              Observaciones asociadas al registro superior
+              {control && novedad ? 'Control CMI / Novedades' : control ? 'Control CMI' : 'Novedades'}
             </div>
             <span className="hidden rounded bg-subte/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-subte lg:inline">
               {record.estacion}
@@ -884,6 +884,24 @@ function CmiNote({ record }) {
       </td>
     </tr>
   );
+}
+
+function cleanNote(value) {
+  const text = String(value || '').trim();
+  const normalized = text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase();
+
+  if (!text || ['-', 'S/I', 'SI', 'NO', 'N/A', 'SIN NOVEDAD', 'SIN NOVEDADES', 'SIN OBSERVACION', 'SIN OBSERVACIONES'].includes(normalized)) {
+    return '';
+  }
+
+  return text;
+}
+
+function hasCmiNote(record) {
+  return Boolean(cleanNote(record.controlCmi) || cleanNote(record.novedad));
 }
 
 function StatusBadge({ status }) {
