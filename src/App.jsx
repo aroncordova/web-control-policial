@@ -496,7 +496,7 @@ function App() {
           <StatCard icon={Siren} label="Alertas" value={stats.critical + stats.observations} detail="Observación y críticos" tone="red" />
         </section>
 
-        <section className="grid gap-4 xl:grid-cols-[1fr_360px]">
+        <section className="grid gap-4">
           <div className="glass-panel rounded-lg p-4">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div>
@@ -546,19 +546,18 @@ function App() {
 
             <div className="mt-4 overflow-hidden rounded-lg border border-line">
               <div className="hidden max-h-[560px] overflow-auto md:block">
-                <table className="min-w-[1180px] w-full table-fixed border-collapse text-left text-[13px]">
+                <table className="min-w-[980px] w-full table-fixed border-collapse text-left text-[13px]">
                   <colgroup>
                     <col className="w-[78px]" />
                     <col className="w-[92px]" />
-                    <col className="w-[180px]" />
-                    <col className="w-[160px]" />
+                    <col className="w-[190px]" />
+                    <col className="w-[165px]" />
                     <col className="w-[76px]" />
-                    <col className="w-[142px]" />
                     <col className="w-[150px]" />
-                    <col className="w-[118px]" />
+                    <col className="w-[158px]" />
+                    <col className="w-[120px]" />
                     <col className="w-[104px]" />
                     <col className="w-[96px]" />
-                    <col />
                   </colgroup>
                   <thead className="sticky top-0 z-10 bg-[#0b1a22] text-[10px] uppercase tracking-[0.12em] text-slate-400">
                     <tr>
@@ -572,19 +571,19 @@ function App() {
                       <Th>Dependencia</Th>
                       <Th>Fiscalización</Th>
                       <Th>Estado</Th>
-                      <Th>Control CMI / Novedad</Th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-line/80">
                     {dayGroups.map(({ day, items }) => (
                       <Fragment key={day}>
                         <tr className="bg-emova/15">
-                          <td colSpan={11} className="px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-cyan-100">
+                          <td colSpan={10} className="px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-cyan-100">
                             {day} · {items.length} registros
                           </td>
                         </tr>
                         {items.map((record) => (
-                          <tr key={`${record.id}-${record.estacion}-${record.hora}`} className="bg-panel/40 transition hover:bg-emova/10">
+                          <Fragment key={`${record.id}-${record.estacion}-${record.hora}`}>
+                          <tr className="bg-panel/40 transition hover:bg-emova/10">
                             <Td>
                               <button
                                 className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-emova/35 bg-emova/10 px-2 text-[11px] font-semibold text-cyan-100 transition hover:border-emova hover:bg-emova/20"
@@ -629,13 +628,9 @@ function App() {
                             <Td>
                               <StatusBadge status={record.estado} />
                             </Td>
-                            <Td>
-                              <p className="max-w-[360px] whitespace-normal leading-4 text-slate-300">{record.controlCmi || record.novedad}</p>
-                              {record.controlCmi && record.novedad ? (
-                                <p className="mt-1 max-w-[360px] whitespace-normal text-[11px] leading-4 text-slate-500">{record.novedad}</p>
-                              ) : null}
-                            </Td>
                           </tr>
+                          <CmiNote record={record} />
+                          </Fragment>
                         ))}
                       </Fragment>
                     ))}
@@ -868,6 +863,42 @@ function SelectControl({ label, icon: Icon, value, onChange, options }) {
         </select>
         <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
     </label>
+  );
+}
+
+function CmiNote({ record }) {
+  const control = String(record.controlCmi || '').trim();
+  const novedad = String(record.novedad || '').trim();
+
+  if (!control && !novedad) {
+    return null;
+  }
+
+  return (
+    <tr className="bg-[#07151d]/80">
+      <td colSpan={10} className="px-3 pb-2 pt-0">
+        <div className="rounded-md border border-emova/20 bg-emova/5 px-3 py-2">
+          <div className="mb-1 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-200">
+            <RadioTower className="h-3.5 w-3.5" />
+            Control CMI / Novedades
+          </div>
+          <div className="grid gap-2 text-[12px] leading-5 text-slate-200 lg:grid-cols-2">
+            {control ? (
+              <p>
+                <span className="mr-2 font-semibold text-subte">Control CMI:</span>
+                {control}
+              </p>
+            ) : null}
+            {novedad ? (
+              <p>
+                <span className="mr-2 font-semibold text-subte">Novedad:</span>
+                {novedad}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </td>
+    </tr>
   );
 }
 
