@@ -30,6 +30,7 @@ const allLinesOption = 'Líneas';
 const allStatusesOption = 'Estados';
 const allShiftsOption = 'Turnos';
 const shiftOptions = [allShiftsOption, morningShift, afternoonShift];
+const networkLines = ['Línea A', 'Línea B', 'Línea C', 'Línea D', 'Línea E', 'Línea H'];
 
 const sampleRecords = [
   {
@@ -181,7 +182,7 @@ const fieldAliases = {
   controlCmi: ['control cmi', 'cmi', 'monitoreo'],
 };
 
-const lineOptions = [allLinesOption, 'Línea A', 'Línea B', 'Línea C', 'Línea D', 'Línea E', 'Línea H', 'Premetro'];
+const lineOptions = [allLinesOption, ...networkLines, 'Premetro'];
 const statusOptions = [allStatusesOption, 'Operativo', 'Observación', 'Crítico'];
 
 function normalizeHeader(value) {
@@ -373,7 +374,7 @@ function App() {
     const totalStaff = filteredRecords.reduce((sum, record) => sum + Number(record.dotacion || 0), 0);
     const critical = filteredRecords.filter((record) => record.estado === 'Crítico').length;
     const observations = filteredRecords.filter((record) => record.estado === 'Observación').length;
-    const activeLines = lineOptions.length - 1;
+    const activeLines = networkLines.length;
     const audited = filteredRecords.filter((record) => String(record.fiscalizado).toUpperCase() === 'SI').length;
     const noExit = filteredRecords.filter((record) => String(record.egreso).toUpperCase() === 'S/I').length;
     return { totalStaff, critical, observations, activeLines, audited, noExit, total: filteredRecords.length };
